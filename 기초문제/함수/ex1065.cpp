@@ -1,12 +1,8 @@
 #include <iostream>
 #include <cstdlib>
 using namespace std;
-int main(){
-    //수 개수
-    int size;
-    cin>>size;
-    //한수 개수
-    int count =0;
+int checkhan(int size){
+ int count =0;
     for(int i=1;i<=size;i++){
         //한수인지 아닌지 판단될 수
         int num=i;
@@ -36,5 +32,13 @@ int main(){
             }
 
     }
-    cout<<count;
+    return count;
+}
+int main(){
+    //수 개수
+    int size;
+    cin>>size;
+    //한수 개수
+    cout<<checkhan(size);
+
 }

@@ -1,6 +1,6 @@
 #include <iostream>
 using namespace std;
-int main(){
+void selfnum(){
     int checkarray[10002]={0};
     int num=1;
     while(num<=10000){
@@ -35,4 +35,7 @@ int main(){
     for(int i=1;i<10001;i++){
         if(checkarray[i]==0)cout<<i<<"\n";
     }
+}
+int main(){
+    selfnum();
 }
