@@ -24,7 +24,7 @@ public class ex11720_2 {
     
       long sum =0;
       for(int i=0;i<cNum.length;i++)
-        sum+=cNum[i];
+        sum+=cNum[i]-'0';
       System.out.println(sum);
     }
 }
