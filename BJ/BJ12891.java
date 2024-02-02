@@ -6,8 +6,8 @@ import java.util.Scanner;
 public class BJ12891 {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        long dis = sc.nextLong();
-        long pw = sc.nextLong();
+        long S = sc.nextLong();
+        long P = sc.nextLong();
         sc.nextLine();
         String dna = sc.nextLine();
         long checkarr[] = new long[4];
@@ -17,10 +17,10 @@ public class BJ12891 {
         long count = 0;
 
         long arr[] = { 0, 0, 0, 0 };
-        for (long i = 0; i <= dis - pw; i++) {
+        for (long i = 0; i <= S - P; i++) {
             long fact = 0;
             if (i == 0) {
-                for (long k = 0; k < pw; k++) {
+                for (long k = 0; k < P; k++) {
                     if (dna.charAt((int) k) == 'A')
                         arr[0]++;
                     else if (dna.charAt((int) k) == 'C')
@@ -39,13 +39,13 @@ public class BJ12891 {
                     arr[2]--;
                 else if (dna.charAt((int) i - 1) == 'T')
                     arr[3]--;
-                if (dna.charAt((int) (i + pw - 1)) == 'A')
+                if (dna.charAt((int) (i + P - 1)) == 'A')
                     arr[0]++;
-                else if (dna.charAt((int) (i + pw - 1)) == 'C')
+                else if (dna.charAt((int) (i + P - 1)) == 'C')
                     arr[1]++;
-                else if (dna.charAt((int) (i + pw - 1)) == 'G')
+                else if (dna.charAt((int) (i + P - 1)) == 'G')
                     arr[2]++;
-                else if (dna.charAt((int) (i + pw - 1)) == 'T')
+                else if (dna.charAt((int) (i + P - 1)) == 'T')
                     arr[3]++;
             }
             for (long a = 0; a < 4; a++) {
