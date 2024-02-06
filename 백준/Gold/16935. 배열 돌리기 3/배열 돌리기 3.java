@@ -19,16 +19,16 @@ public class Main {
         }
     }
 
-    public static int[][] upDown(int arr[][]) {
+    public static void upDown(int arr[][]) {
         for (int i = 0; i < N / 2; i++) {
             int tmp[] = arr[i];
             arr[i] = arr[N - i - 1];
             arr[N - i - 1] = tmp;
         }
-        return arr;
+
     }
 
-    public static int[][] leftRight(int arr[][]) {
+    public static void leftRight(int arr[][]) {
         for (int k = 0; k < N; k++) {
             for (int i = 0; i < M / 2; i++) {
                 int tmp = arr[k][i];
@@ -36,7 +36,6 @@ public class Main {
                 arr[k][M - i - 1] = tmp;
             }
         }
-        return arr;
     }
 
     public static int[][] right90(int arr[][]) {
@@ -68,7 +67,7 @@ public class Main {
         return chArr;
     }
 
-    public static int[][] groupMoveClockwise(int arr[][]) {
+    public static void groupMoveClockwise(int arr[][]) {
         int firstBox[][] = new int[N / 2][M / 2];
         for (int i = 0; i < N / 2; i++) {
             for (int k = 0; k < M / 2; k++) {
@@ -98,10 +97,9 @@ public class Main {
                 arr[i][k + M / 2] = firstBox[i][k];
             }
         }
-        return arr;
     }
 
-    public static int[][] groupMoveCounterClockwise(int arr[][]) {
+    public static void groupMoveCounterClockwise(int arr[][]) {
         int firstBox[][] = new int[N / 2][M / 2];
         for (int i = 0; i < N / 2; i++) {
             for (int k = 0; k < M / 2; k++) {
@@ -132,7 +130,6 @@ public class Main {
                 arr[i + N / 2][k] = firstBox[i][k];
             }
         }
-        return arr;
     }
 
     public static void main(String args[]) throws IOException {
@@ -154,25 +151,24 @@ public class Main {
         String calStr = br.readLine();
         String[] cal = calStr.split(" ");
         for (int i = 0; i < R; i++) {
-            int chArr[][];
             if (cal[i].equals("1")) {
-                chArr = upDown(arr);
-                arr = chArr;
+                upDown(arr);
+
             } else if (cal[i].equals("2")) {
-                chArr = leftRight(arr);
-                arr = chArr;
+                leftRight(arr);
+
             } else if (cal[i].equals("3")) {
-                chArr = right90(arr);
-                arr = chArr;
+                arr = right90(arr);
+
             } else if (cal[i].equals("4")) {
-                chArr = left90(arr);
-                arr = chArr;
+                arr = left90(arr);
+
             } else if (cal[i].equals("5")) {
-                chArr = groupMoveClockwise(arr);
-                arr = chArr;
+                groupMoveClockwise(arr);
+
             } else if (cal[i].equals("6")) {
-                chArr = groupMoveCounterClockwise(arr);
-                arr = chArr;
+                groupMoveCounterClockwise(arr);
+
             }
         }
         printArr(arr);
