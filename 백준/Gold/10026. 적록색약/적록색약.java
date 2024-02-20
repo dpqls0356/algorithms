@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -26,7 +25,6 @@ public class Main {
 				arr[i][k] = str.charAt(k);
 			}
 		}
-		//일반사람은 3번 DFS
 		for(int i=0;i<N;i++) {
 			for(int k=0;k<N;k++) {
 				if(!visitedR[i][k]&&arr[i][k]=='R') {
@@ -54,15 +52,11 @@ public class Main {
 				}
 			}
 		}
-//		//색약은 2번만 DFS
-//		DFSN('R',0,0);
-//		DFSN('B',0,0);
 		for(int i=0;i<N;i++) {
 			for(int k=0;k<N;k++) {
 				if(!visitedN[i][k]&&(arr[i][k]=='R'||arr[i][k]=='G')) {
 					visitedN[i][k] = true;
-//					System.out.println(i+" "+k);
-					DFSN('R',i,k);
+					DFSN(arr[i][k],i,k);
 					cntN++;
 				}
 			}
@@ -71,7 +65,7 @@ public class Main {
 			for(int k=0;k<N;k++) {
 				if(!visitedN[i][k]&&arr[i][k]=='B') {
 					visitedN[i][k] = true;
-					DFSN('B',i,k);
+					DFSN(arr[i][k],i,k);
 					cntN++;
 				}
 			}
