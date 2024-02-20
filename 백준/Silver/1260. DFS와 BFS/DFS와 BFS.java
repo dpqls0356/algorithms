@@ -1,11 +1,8 @@
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
-
 public class Main {
 	static ArrayList<Integer> list[];
 	static boolean visitedDfs[];
@@ -32,11 +29,9 @@ public class Main {
 			else 
 				list[a].add(b);
 		}
-		// 정점 번호가 작은 것부터 방문하기 위해서 정렬
-		for(int i=0;i<N+1;i++) {
+        for(int i=0;i<N+1;i++) {
 			Collections.sort(list[i]);
 		}
-		
 		DFS(V);
 		System.out.println();
 		visitedBfs[V] = true;
@@ -67,11 +62,3 @@ public class Main {
 		}
 	}
 }
-
-//for(int i=0;i<N+1;i++) {
-//	System.out.print("["+i+"] ");
-//	for(int k=0;k<list[i].size();k++) {
-//		System.out.print(list[i].get(k)+" ");
-//	}
-//	System.out.println();
-//}
