@@ -1,35 +1,40 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.StringTokenizer;
+import java.util.Scanner;
 
 public class Main {
-	static Integer[] dp;
-	
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		int N = Integer.parseInt(br.readLine());
-		dp = new Integer[N+1];
-		dp[0]=dp[1]=0;
-		System.out.println(recur(N));
-	}
-	static int recur(int N) {
-		if(dp[N]==null) {
-			if(N%6==0) {
-				dp[N] = Math.min(recur(N-1), Math.min(recur(N/3), recur(N/2)))+1;
-			}
-			else if(N%3==0) {
-				dp[N] = Math.min(recur(N-1), recur(N/3))+1;
-			}
-			else if(N%2==0) {
-				dp[N] = Math.min(recur(N/2),recur(N-1))+1;
-			}
-			else {
-				dp[N] =recur(N-1)+1;
-			}
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		int n = sc.nextInt();
+		
+		int dp[] = new int[n+1];
+		
+		dp[0] = dp[1] = 0;
+		if(n>1) {
+			dp[2]=1;
 		}
-		return dp[N];
+		if(n>2) {
+			dp[3] = 1;			
+		}
+		int cur = 1;
+		while(cur<=n) {
+			int cnt;
+			int minCnt = Integer.MAX_VALUE;
+			if(cur<4) {
+				cur++;
+				continue;
+			}
+			if(cur%3==0) {
+				cnt = (dp[cur/3]+1);
+				if(minCnt>cnt)minCnt = cnt;
+			}
+			if(cur%2==0) {
+				cnt = (dp[cur/2]+1);
+				if(minCnt>cnt)minCnt = cnt;
+			}
+			cnt = dp[cur-1]+1;
+			if(minCnt>cnt)minCnt = cnt;
+			dp[cur] = minCnt;
+			cur++;
+		}
+		System.out.print(dp[n]);
 	}
 }
-
-
