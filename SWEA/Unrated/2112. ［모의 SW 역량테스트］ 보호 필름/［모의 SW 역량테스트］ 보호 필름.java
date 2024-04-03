@@ -30,23 +30,17 @@ public class Solution {
 					copy[i][k] = arr[i][k];
 				}
 			}
-			// 약품을 안넣어도 되는 경우
-			if (checked()||K==1) {
-				System.out.println("#" + t + " " + 0);
-			}
-			// 약품을 넣어야하는 경우
-			else {
 				minAdd = Integer.MAX_VALUE;
 				DFS(0, 0); // 넣을지 안넣을지 선택한 홧수 , 넣은 약품 수 , 현재 보호필름 상태로 dfs돌리기
 				System.out.println("#" + t + " " + minAdd);
-			}
+			
 		}
-
 
 	}
 
 	public static void DFS(int len, int add) {
-		if(add>minAdd)return ;
+		if (add > minAdd)
+			return;
 		// 넣을지 안넣을지 전부 판단한 경우
 		if (len == D) {
 			if (checked()) { // 검사에 통과 되었을 때
@@ -57,30 +51,25 @@ public class Solution {
 			}
 		} else {
 			// 안넣는 경우 이전 배열 그대로 쓰기 - 넣는 약품의 수를 최소화 하기 위함
-			if (add <= minAdd) {
-				DFS(len + 1, add);
-			}
+			DFS(len + 1, add);
 
 			// A를 넣는 경우 0
-			if (add <= minAdd) {
-				for (int i = 0; i < W; i++) {
-					arr[len][i] = 0;
-				}
-				DFS(len + 1, add + 1);
-				for (int i = 0; i < W; i++) {
-					arr[len][i] = copy[len][i];
-				}
+			for (int i = 0; i < W; i++) {
+				arr[len][i] = 0;
+			}
+			DFS(len + 1, add + 1);
+			for (int i = 0; i < W; i++) {
+				arr[len][i] = copy[len][i];
 			}
 
 			// B를 넣는 경우 1
-			if (add <= minAdd) {
-				for (int i = 0; i < W; i++) {
-					arr[len][i] = 1;
-				}
-				DFS(len + 1, add + 1);
-				for (int i = 0; i < W; i++) {
-					arr[len][i] = copy[len][i];
-				}
+			for (int i = 0; i < W; i++) {
+				arr[len][i] = 1;
+			}
+			DFS(len + 1, add + 1);
+			for (int i = 0; i < W; i++) {
+				arr[len][i] = copy[len][i];
+
 			}
 		}
 	}
