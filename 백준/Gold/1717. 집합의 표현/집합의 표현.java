@@ -1,69 +1,59 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
 
 public class Main {
-    static int parents[];
-    static int N, M;
+
+    static int[] arr;
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
 
-        parents = new int[N + 1];
-        makeSet();
+        int N = Integer.parseInt(st.nextToken());
+        int R = Integer.parseInt(st.nextToken());
+        arr = new int[N + 1];
 
-        while (M-- > 0) {
+        for (int i = 1; i <= N; i++) {
+            arr[i] = i;
+        }
+
+        for (int i = 0; i < R; i++) {
             st = new StringTokenizer(br.readLine());
-            int cal = Integer.parseInt(st.nextToken());
-            int a = Integer.parseInt(st.nextToken());
-            int b = Integer.parseInt(st.nextToken());
-            if (cal == 0) {
-                union(a, b);
-            } else if (cal == 1) {
-                if (find(a, b))
+
+            int h = Integer.parseInt(st.nextToken());
+
+            if (h == 0) {
+                union(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()));
+            } else {
+                int a = find(Integer.parseInt(st.nextToken()));
+                int b = find(Integer.parseInt(st.nextToken()));
+                if (a == b) {
                     System.out.println("YES");
-                else
+                } else {
                     System.out.println("NO");
+                }
+
             }
         }
-
     }
 
-    public static void makeSet() {
-        for (int i = 0; i <= N; i++) {
-            parents[i] = i;
+    private static int find(int parseInt) {
+        if (arr[parseInt] != parseInt) {
+
+            return arr[parseInt] = find(arr[parseInt]);
+        }
+        return parseInt;
+    }
+
+    private static void union(int parseInt, int parseInt2) {
+        int a = find(parseInt);
+        int b = find(parseInt2);
+        if (a != b) {
+            arr[b] = a;
         }
     }
 
-    public static void union(int a, int b) {
-        int rootA = isParent(a);
-        int rootB = isParent(b);
-        // System.out.println("union " + rootA + " " + rootB);
-        if (rootA > rootB) {
-            parents[rootB] = rootA;
-        } else {
-            parents[rootA] = rootB;
-        }
-        // for (int i = 0; i <= N; i++) {
-        // System.out.print(parents[i] + " ");
-        // }
-        // System.out.println();
-    }
-
-    public static boolean find(int a, int b) {
-        int rootA = isParent(a);
-        int rootB = isParent(b);
-        // System.out.println("find " + rootA + " " + rootB);
-        if (rootA != rootB) {
-            return false;
-        }
-        return true;
-    }
-
-    public static int isParent(int a) {
-        return parents[a] = (a == parents[a] ? a : isParent(parents[a]));
-    }
 }
