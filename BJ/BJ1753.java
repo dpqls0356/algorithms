@@ -1,4 +1,3 @@
-package BJ;
 
 import java.io.*;
 import java.io.IOException;

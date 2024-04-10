@@ -1,4 +1,3 @@
-package BJ;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

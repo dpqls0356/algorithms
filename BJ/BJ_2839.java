@@ -1,5 +1,3 @@
-package BJ;
-
 import java.util.Scanner;
 
 /**

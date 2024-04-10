@@ -1,4 +1,3 @@
-package BJ;
 
 import java.util.StringTokenizer;
 import java.util.*;
