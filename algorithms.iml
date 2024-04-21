@@ -10,8 +10,6 @@
       <excludeFolder url="file://$MODULE_DIR$/SWEA/D6" />
       <excludeFolder url="file://$MODULE_DIR$/SWEA/D8" />
       <excludeFolder url="file://$MODULE_DIR$/SWEA/Unrated" />
-      <excludeFolder url="file://$MODULE_DIR$/기초문제" />
-      <excludeFolder url="file://$MODULE_DIR$/백준" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
