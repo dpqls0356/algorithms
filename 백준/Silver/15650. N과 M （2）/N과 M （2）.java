@@ -1,49 +1,37 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
 public class Main {
-    static int N;
-    static int M;
-    static int cnt = 0;
-    static StringBuilder sb = new StringBuilder();
-    static boolean visited[];
-    static int arr[];
-
-    public static void main(String[] args) throws IOException {
-
+    static private int size;
+    static private int maxNumber;
+    static private boolean visited[];
+    public static void main(String args[]) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
 
-        // N = Integer.parseInt(st.nextToken());
-        // M = Integer.parseInt(st.nextToken());
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
-        visited = new boolean[N];
-        arr = new int[M];
-        re(cnt, 1);
-        System.out.println(sb.toString());
+        maxNumber = Integer.parseInt(st.nextToken());
+        size = Integer.parseInt(st.nextToken());
+
+        visited = new boolean[maxNumber+1];
+        for(int i = 1;i<=maxNumber;i++){
+            visited[i] = true;
+            recrusive(1,i+"",i);
+        }
+
     }
-
-    public static void re(int cnt, int before) {
-        if (cnt == M) {
-            for (int num : arr) {
-                sb.append(num + " ");
-            }
-            sb.append("\n");
-        } else {
-            for (int i = before; i <= N; i++) {
-                if (!visited[i - 1]) {
-                    // System.out.println("test " + cnt + " " + i + " " + !visited[i - 1]);
-                    arr[cnt] = i;
-                    before = i;
-                    visited[i - 1] = true;
-                    re(cnt + 1, before + 1);
-                    visited[i - 1] = false;
+    static public void recrusive(int cnt,String result,int beforeNumber){
+        if(cnt ==size){
+            System.out.println(result);
+        }
+        else{
+            for(int i=1;i<=maxNumber;i++){
+                if(i>beforeNumber&&!visited[i]){
+                    visited[i]= true;
+                    recrusive(cnt+1,result+" "+i,i);
+                    visited[i]= false;
                 }
-
             }
         }
     }
