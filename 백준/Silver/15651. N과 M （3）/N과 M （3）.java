@@ -1,40 +1,37 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
 public class Main {
-    static int N;
-    static int M;
-    static int cnt = 0;
-    static StringBuilder sb = new StringBuilder();
-    static int arr[];
 
-    public static void main(String[] args) throws IOException {
+    static private int size;
+    static private int maxNum;
+    static private int[] arr;
+    static private StringBuilder sb = new StringBuilder();
+    public static void main(String args[]) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
 
-        // N = Integer.parseInt(st.nextToken());
-        // M = Integer.parseInt(st.nextToken());
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
-        arr = new int[M];
-        re(cnt);
+        maxNum = Integer.parseInt(st.nextToken());
+        size = Integer.parseInt(st.nextToken());
+        arr = new int[size+1];
+
+        recrusive(0);
         System.out.println(sb.toString());
     }
-
-    public static void re(int cnt) {
-        if (cnt == M) {
-            for (int num : arr) {
-                sb.append(num + " ");
+    public static void recrusive(int depth){
+        if(size==depth){
+            for(int i=1;i<=size;i++) {
+                sb.append(arr[i] + " ");
             }
             sb.append("\n");
-        } else {
-            for (int i = 1; i <= N; i++) {
-                arr[cnt] = i;
-                re(cnt + 1);
+        }
+        else{
+            for(int i=1;i<=maxNum;i++){
+                arr[depth+1] = i;
+                recrusive(depth+1);
             }
         }
     }
