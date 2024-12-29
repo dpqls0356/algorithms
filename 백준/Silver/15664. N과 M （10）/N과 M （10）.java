@@ -1,39 +1,49 @@
 import java.util.*;
+import java.io.*;
 
 public class Main {
-    static int N, M;
-    static int[] arr;
-    static boolean visitied[];
-    static StringBuilder sb = new StringBuilder();
-    static ArrayList<String> list = new ArrayList<>();
+    private static int inputSize;
+    private static int size;
+    private static int[] arr;
+    private static int[] numbers;
+    private static HashSet<String> history = new HashSet<String>();
+    private static StringBuilder sb = new StringBuilder();
 
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        N = sc.nextInt();
-        M = sc.nextInt();
-        arr = new int[N];
-        visitied = new boolean[N];
-        for (int i = 0; i < N; i++) {
-            arr[i] = sc.nextInt();
+    public static void main(String args[]) throws IOException{
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+
+        inputSize = Integer.parseInt(st.nextToken());
+        size = Integer.parseInt(st.nextToken());
+
+        arr = new int[size];
+        numbers = new int[inputSize];
+
+        st = new StringTokenizer(br.readLine());
+        for(int i=0;i<inputSize;i++){
+            numbers[i] = Integer.parseInt(st.nextToken());
         }
-        Arrays.sort(arr);
-        res(0, "", 0);
-        System.out.print(sb);
+        Arrays.sort(numbers);
+        recrusive(0,0);
+        System.out.println(sb.toString());
     }
-
-    public static void res(int cnt, String str, int before) {
-        if (cnt == M) {
-            if (!list.contains(str)) {
-                list.add(str);
-                sb.append(str + "\n");
+    public static void recrusive(int depth,int beforeIndex){
+        if(depth==size){
+            StringBuilder permutation = new StringBuilder();
+            for(int i=0;i<size;i++){
+                permutation.append(arr[i]+" ");
             }
-        } else {
-            for (int i = 0; i < N; i++) {
-                if (!visitied[i] && before <= arr[i]) {
-                    visitied[i] = true;
-                    res(cnt + 1, str + arr[i] + " ", arr[i]);
-                    visitied[i] = false;
-                }
+            permutation.append("\n");
+            if(!history.contains(permutation.toString())){
+                history.add(permutation.toString());
+                sb.append(permutation.toString());
+            }
+        }
+        else{
+            for(int i = beforeIndex;i<inputSize;i++){
+                arr[depth] = numbers[i];
+                recrusive(depth+1,i+1);
             }
         }
     }
