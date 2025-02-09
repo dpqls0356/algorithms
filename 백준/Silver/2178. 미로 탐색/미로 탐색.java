@@ -1,57 +1,66 @@
-import java.io.*;
 import java.util.*;
+import java.io.*;
+
 
 public class Main {
-	static int N,M;
-	static int arr[][];
-	static boolean visited[][];
-	static class Spot{
-		int x;
-		int y;
-		int cnt;
-		public Spot() {}
-		public Spot(int x,int y,int cnt) {
-			this.x=x;
-			this.y=y;
-			this.cnt =cnt;
-		}
-	}
-	public static void main(String[] args)throws IOException {
-		
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		 StringTokenizer st = new StringTokenizer(br.readLine());
-		 N = Integer.parseInt(st.nextToken());
-		 M = Integer.parseInt(st.nextToken());
-		 
-		 arr = new int[N+1][M+1];
-		 visited = new boolean[N+1][M+1];
-		 for(int i=1;i<N+1;i++) {
-			 String str =br.readLine();  
-			 for(int k=1;k<M+1;k++) {
-				 arr[i][k] = str.charAt(k-1)-'0';
+    
+    private static int row;
+    private static int col;
+    //상하좌우
+    private static int[] dx = {0,0,-1,1};
+    private static int[] dy = {1,-1,0,0};
+    private static boolean[][] visited;
+    private static int[][] map;
+    private static int[][] memo;
+    
+    public static void main(String[] args) throws IOException {
 
-			 }
-		 }
-		 BFS();
-	}
-	public static void BFS() {
-		Queue<Spot> que = new ArrayDeque();
-		que.add(new Spot(1,1,1));
-		while(!que.isEmpty()) {
-			Spot cur = que.poll();
-			if(cur.x==N&&cur.y==M) {
-				System.out.println(cur.cnt);
-			}
-			int dx[] = {1,-1,0,0};
-			int dy[] = {0,0,1,-1};
-			for(int i=0;i<4;i++) {
-				int x = cur.x+dx[i];
-				int y = cur.y+dy[i];
-				if(x>0&&x<N+1&&y>0&&y<M+1&&!visited[x][y]&&arr[x][y]==1) {
-					visited[x][y] = true;
-					que.add(new Spot(x,y,cur.cnt+1));
-				}
-			}
-		}
-	}
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        
+        row = Integer.parseInt(st.nextToken());
+        col = Integer.parseInt(st.nextToken());
+        
+        map = new int[row][col];
+        memo = new int[row][col];
+        visited = new boolean[row][col];
+        
+        for(int i=0;i<row;i++){
+            String str = br.readLine();
+            for(int k=0;k<col;k++){
+                map[i][k] = Integer.parseInt(str.charAt(k)+"");
+                memo[i][k] = Integer.MAX_VALUE;
+            }
+        }
+        
+        memo[0][0] = 1;
+        
+        for(int i=0;i<row;i++){
+            for(int k=0;k<col;k++){
+                if(!visited[i][k]&&map[i][k]==1){
+                    dfs(i,k);
+                }
+            }
+        }
+        
+        System.out.print(memo[row-1][col-1]);
+        
+    }
+    
+    public static void dfs(int x,int y){
+            for(int i=0;i<4;i++){
+            int newX = x + dx[i];
+            int newY = y + dy[i];
+                if(newX>=0&&newX<row&&newY>=0&&newY<col&&!visited[newX][newY]&&map[newX][newY]==1){
+                    int num = memo[x][y]+1;
+                    if(memo[newX][newY]>num){
+                        memo[newX][newY] = num;
+                        visited[newX][newY] = true;
+                        dfs(newX,newY);
+                        visited[newX][newY] = false;
+                    }
+                }
+         
+            }
+    }
 }
