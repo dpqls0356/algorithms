@@ -12,19 +12,7 @@ public class Main {
         
         //100이 들어오면 10까지만 소수구하기 -> 어차피 10*10이 100이기때문 11*11*n은 배수가 될 수 없음
         int range = (int)Math.sqrt(max);
-        boolean[] isPrime = new boolean[range+1];
         
-        for(int i=2;i<=range;i++){
-            isPrime[i] = true;
-        }
-        
-        for(int i=2;i<=range;i++){
-            if(isPrime[i]){
-                for(int k=2;i*k<=range;k++){
-                    isPrime[i*k]=false;
-                }
-            }
-        }
         //소수 제곱근 해서 제곱ㄴㄴ의 수가 아닌 수 찾기 = 제곱으로 나누어떨어지는 친구 찾기
         //max-min 최대가 1,000,000인걸 고려
         boolean[] check = new boolean[(int)(max-min+1)];
