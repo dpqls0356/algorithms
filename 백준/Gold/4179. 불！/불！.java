@@ -1,107 +1,130 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayDeque;
-import java.util.Queue;
-import java.util.StringTokenizer;
-
+import java.util.*;
+import java.io.*;
+/*
+탈출여부 + 빨리 탈출 할 수 있는가
+1. 지훈이는 매 분마다 한칸씩!!!! 이동한다
+2. 불은 현재 위치에서 사방향으로 이동한다
+3. 탈출은 가장자리에 접한 공간에서 탈출 할 수 있다.
+*/
 public class Main {
-
-  static char[][] arr;
-  static boolean[][] visited;
-  static int N, M;
-  static int jiHunX;
-  static int jiHunY;
-  static Queue<int[]> que2 = new ArrayDeque<>();
-
-  public static void main(String[] args) throws IOException {
-    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    StringTokenizer st = new StringTokenizer(br.readLine());
-    N = Integer.parseInt(st.nextToken());
-    M = Integer.parseInt(st.nextToken());
-
-    arr = new char[N][M];
-    visited = new boolean[N][M];
-
-    for (int i = 0; i < N; i++) {
-      String str = br.readLine();
-      for (int k = 0; k < M; k++) {
-        arr[i][k] = str.charAt(k);
-        if (arr[i][k] == 'J') {
-          jiHunX = i;
-          jiHunY = k;
-          arr[i][k] = '.';
-
-        }
-        if (arr[i][k] == 'F') {
-          que2.add(new int[] { i, k });
-        }
-      }
-    }
-    if (jiHunX == 0 || jiHunX == N - 1 || jiHunY == 0 || jiHunY == M - 1) {
-      System.out.println(1);
-      return;
-    }
-    BFS();
-
-  }
-
-  public static void BFS() {
-    int dx[] = { 0, 1, 0, -1 };
-    int dy[] = { 1, 0, -1, 0 };
-
-    Queue<int[]> que = new ArrayDeque<>();
-    que.add(new int[] { jiHunX, jiHunY, 0 });
-    visited[jiHunX][jiHunY] = true;
-
-    while (!que.isEmpty()) {
-      int fireCount = que2.size();
-      // System.out.println();
-      // for (int i = 0; i < N; i++) {
-      // for (int k = 0; k < M; k++) {
-      // System.out.print(arr[i][k] + " ");
-      // }
-      // System.out.println();
-      // }
-      int cur[] = que.poll();
-      int curX = cur[0];
-      int curY = cur[1];
-
-      if (curX == 0 || curX == N - 1 || curY == 0 || curY == M - 1) {
-        if (arr[curX][curY] != 'F') {
-          System.out.println(cur[2] + 1);
-          return;
-        } else
-          continue;
-      }
-
-      for (int a = 0; a < 4; a++) {
-
-        int x = curX + dx[a];
-        int y = curY + dy[a];
-
-        if (x >= 0 && x < N && y >= 0 && y < M && !visited[x][y] && arr[x][y] == '.') {
-          visited[x][y] = true;
-          que.add(new int[] { x, y, cur[2] + 1 });
-        }
-      }
-      if(!que.isEmpty()){
-        int next[] = que.peek();
-        if (next[2] == cur[2] + 1) {
-          for (int i = 0; i < fireCount; i++) {
-            int cur2[] = que2.poll();
-            for (int j = 0; j < 4; j++) {
-              int x = cur2[0] + dx[j];
-              int y = cur2[1] + dy[j];
-              if (x >= 0 && x < N && y >= 0 && y < M && arr[x][y] == '.') {
-                que2.add(new int[] { x, y });
-                arr[x][y] = 'F';
-              }
+    
+    private static int row;
+    private static int col;
+    private static char[][] map; //지도
+    private static boolean[][] visited; //벽, 불, 이미 이동한 위치 체킹
+    private static Queue<int[]> jihun = new LinkedList<>(); // x,y,cnt
+    private static Queue<int[]> fire = new LinkedList<>(); // x,y,cnt
+    private static int[] dx = {0,0,-1,1};
+    private static int[] dy = {-1,1,0,0};
+    
+    public static void main(String[] args) throws IOException {
+    
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        
+        row = Integer.parseInt(st.nextToken());
+        col = Integer.parseInt(st.nextToken());
+        
+        map = new char[row][col];
+        visited = new boolean[row][col];
+        
+        for(int i=0;i<row;i++){
+            String str =  br.readLine();
+            for(int k=0;k<col;k++){
+                char c = str.charAt(k);
+                map[i][k] = c;
+                if(c=='#'){
+                    visited[i][k] = true;
+                }
+                else if(c=='J'){
+                    visited[i][k] = true;
+                    jihun.add(new int[]{i,k,0});//행/열
+                }
+                else if(c=='F'){
+                    visited[i][k] = true;
+                    fire.add(new int[]{i,k,0});
+                }
             }
-          }
         }
-      }
+        int result = BFS();
+        if(result == -1){
+            System.out.println("IMPOSSIBLE");
+        }
+        else{
+            System.out.println(result);
+        }
     }
-    System.out.println("IMPOSSIBLE");
-  }
+    
+    public static int BFS(){
+        
+        while(!jihun.isEmpty()){
+            // System.out.println("=========================");
+            // for(int i=0;i<row;i++){
+                // for(int k=0;k<col;k++){
+                    // System.out.print(map[i][k]+" ");
+                // }
+                // System.out.println();
+            // }
+            int cur[] = jihun.poll(); //행,렬,cnt;
+            //탈출 위치인 경우 cnt를 리턴
+            if(cur[0]==row-1||cur[0]==0||cur[1]==col-1||cur[1]==0){
+                return cur[2]+1;
+            }
+            else{
+
+                map[cur[0]][cur[1]] = '.';
+                // System.out.println("============이동전=============");
+                // for(int i=0;i<row;i++){
+                    // for(int k=0;k<col;k++){
+                        // System.out.print(map[i][k]+" ");
+                    // }
+                    // System.out.println();
+                // }
+                //불붙이기
+                // System.out.println("burning");
+                burning(cur[2]);
+                // System.out.println("============불 이동 후=============");
+                // for(int i=0;i<row;i++){
+                    // for(int k=0;k<col;k++){
+                        // System.out.print(map[i][k]+" ");
+                    // }
+                    // System.out.println();
+                // }
+                //불 옮긴 후 지훈이 이동
+                for(int i=0;i<4;i++){
+                    int newX = cur[1]+dx[i];//좌우 - 열
+                    int newY = cur[0]+dy[i];//상하 - 행
+                    if(newX>=0&&newX<col&&newY>=0&&newY<row&&!visited[newY][newX]&&map[newY][newX]=='.'){
+                        visited[newY][newX] = true;
+                        map[newY][newX] = 'J';
+                        jihun.add(new int[]{newY,newX,cur[2]+1});
+                    }
+                }
+            }
+
+        }
+        return -1;
+    }
+    
+    public static void burning(int curCnt){
+        while(!fire.isEmpty()){
+            int cur[] = fire.poll(); // 행 열 cnt
+            // System.out.println("cur: "+cur[2]+" "+"curCnt: "+curCnt);
+            if(cur[2]!=curCnt){
+                fire.add(cur);
+                break;
+            }
+            for(int i=0;i<4;i++){
+                int newX = cur[1]+dx[i];// 열
+                int newY = cur[0]+dy[i];//행
+                if(newX>=0&&newX<col&&newY>=0&&newY<row&&map[newY][newX]=='.'){
+                    // System.out.println(newY+" "+newX+" "+cur[2]);
+                    map[newY][newX]='F';
+                    visited[newY][newX]=true;
+                    fire.add(new int[]{newY,newX,cur[2]+1});
+                }
+            }
+        }
+        
+    }
 }
