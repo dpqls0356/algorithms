@@ -2,58 +2,33 @@ import java.util.*;
 import java.io.*;
 
 public class Main {
-	public static boolean visited[] = new boolean[100001];
-	public static int start,end;
-	public static void main(String[] args)throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		
-		start = Integer.parseInt(st.nextToken());
-		end = Integer.parseInt(st.nextToken());
-		visited[start] = true;
-		
-		BFS();
-	}
-	public static void BFS() {
-		Queue<int[]> que = new LinkedList<>();
-		que.add(new int[] {start,0});
-		
-		while(!que.isEmpty()) {
-//			System.out.println("\n------------------------");
-			int cur[] = que.poll();
-			int num = cur[0];
-			int cnt = cur[1];
-			if(num==end) {
-//				System.out.println(num+" "+cnt);
-				System.out.println(cnt);
-				return;
-			}
-//			System.out.print(num+" : ");
-			if(num>end) {
-				if(num-1>=0&&!visited[num-1]) {
-					que.add(new int[] {num-1,cnt+1});
-					visited[num-1]= true;
-//					System.out.print((num-1)+" ");
-				}
-			}
-			else {
-				if(num-1>=0&&!visited[num-1]) {
-					que.add(new int[] {num-1,cnt+1});
-					visited[num-1]= true;
-//					System.out.print((num-1)+" ");
-				}
-				if(num+1<100001&&!visited[num+1]) {
-					que.add(new int[] {num+1,cnt+1});
-					visited[num+1]= true;
-//					System.out.print((num+1)+" ");
-				}
-				if(num*2<100001&&!visited[num*2]) {
-					que.add(new int[] {num*2,cnt+1});
-					visited[num*2]= true;
-//					System.out.print((num*2)+" ");
+    
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int su = sc.nextInt();
+        int sister = sc.nextInt();
+        
+        Queue<int[]> que = new LinkedList<>();
+        boolean[] visited = new boolean[1_000_001];
+        
+        que.add(new int[]{su,0}); // 수빈 위치 / 시간
+        
+        while(!que.isEmpty()){
+            int[] cur = que.poll();
+            if(cur[0]==sister){
+                System.out.println(cur[1]);
+                System.exit(0);
+            }
+            else{
+                int next[] = new int[] {cur[0]+1,cur[0]*2,cur[0]-1};
+                for(int i=0;i<3;i++){
+                    if(next[i]>=0&&next[i]<=1_000_000&&!visited[next[i]]){
+                        visited[next[i]] = true;
+                        que.add(new int[]{next[i],cur[1]+1});
+                    }
+                }
+            }
+        }
 
-				}
-			}
-		}
-	}
+    }
 }
