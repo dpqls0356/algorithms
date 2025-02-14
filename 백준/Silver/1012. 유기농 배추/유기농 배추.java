@@ -1,72 +1,76 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.StringTokenizer;
+import java.util.*;
+import java.io.*;
+//상하좌우로 이동
+//배추가 모여있는 곳에 한마리만 있으면 된다. => 구역찾기 dfs or bfs 둘 다 상관없을 듯?
+//배열 써도 되지만 arrayList써서 간선만 넣어도 될듯?
 
 public class Main {
-    static boolean visited[][];
-    static int list[][];
-    static Queue<int[]> que = new LinkedList<int[]>();
-    static int[] x = { 1, 0, -1, 0 };
-    static int[] y = { 0, 1, 0, -1 };
-    static int H, W;
-
+    
+    public static int[][] map;
+    public static boolean[][] visited;
+    public static int row;
+    public static int col;
+    public static int[] dx = {0,0,-1,1}; //레전드 0,0,-1,0으로 해버림 ;;
+    public static int[] dy = {1,-1,0,0};
+    public static StringBuilder sb = new StringBuilder();
+    
     public static void main(String[] args) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        BufferedReader br = new BufferedReader(new InputStreamReader((System.in)));
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
+        
         int T = Integer.parseInt(st.nextToken());
-        while (T > 0) {
-            // 배추농장 만들기
+        
+        while(T>0){
             st = new StringTokenizer(br.readLine());
-            H = Integer.parseInt(st.nextToken());
-            W = Integer.parseInt(st.nextToken());
-            int cabbage = Integer.parseInt(st.nextToken());
-            list = new int[H][W];
-            visited = new boolean[H][W];
-            for (int i = 0; i < cabbage; i++) {
+            col = Integer.parseInt(st.nextToken());
+            row = Integer.parseInt(st.nextToken());
+            int inputSize = Integer.parseInt(st.nextToken());
+            
+            map = new int[row][col];
+            visited = new boolean[row][col];
+            
+            for(int i=0;i<inputSize;i++){
                 st = new StringTokenizer(br.readLine());
-                list[Integer.parseInt(st.nextToken())][Integer.parseInt(st.nextToken())] = 1;
+                int x = Integer.parseInt(st.nextToken());
+                int y = Integer.parseInt(st.nextToken());
+                map[y][x] = 1; // x = 열 / y = 행
             }
-            // 모여있는 배추의 수 구하기
-            int land = 0;
-            // System.out.println();
-            // for (int i = 0; i < H; i++) {
-            // for (int k = 0; k < W; k++) {
-            // System.out.print(list[i][k] + " ");
+            
+            // System.out.println("======================");
+            // for(int i=0;i<row;i++){//y
+                // for(int k=0;k<col;k++){ //x
+                    // System.out.print(map[i][k]+" ");
+                // }
+                // System.out.println();
             // }
-            // System.out.println();
-            // }
-            for (int i = 0; i < H; i++) {
-                for (int k = 0; k < W; k++) {
-                    if (!visited[i][k] && list[i][k] == 1) {
-                        // System.out.println(i + " " + k + "pick");
-                        que.add(new int[] { i, k });
-                        bfs();
-                        land++;
+            
+            int count = 0;
+            for(int i=0;i<row;i++){//y
+                for(int k=0;k<col;k++){ //x
+                    if(!visited[i][k]&&map[i][k]==1){
+                        count++;
+                        // System.out.println(i+" "+k);
+                        dfs(i,k); // 행 - 열
                     }
                 }
             }
-            sb.append(land + "\n");
+            
+            sb.append(count+"\n");
+            
             T--;
-            // System.out.println("-----------------------");
         }
-        System.out.print(sb);
+        
+        System.out.print(sb.toString());
     }
-
-    public static void bfs() {
-        while (!que.isEmpty()) {
-            int cur[] = que.poll();
-            for (int i = 0; i < x.length; i++) {
-                int dx = cur[0] + x[i];
-                int dy = cur[1] + y[i];
-                if (dx >= 0 && dx < H && dy >= 0 && dy < W && !visited[dx][dy] && list[dx][dy] == 1) {
-                    que.add(new int[] { dx, dy });
-                    visited[dx][dy] = true;
-                }
+    //행 - 열
+    public static void dfs(int curY,int curX){
+        for(int i=0;i<4;i++){
+            int x = curX+dx[i]; // 열
+            int y = curY+dy[i]; // 행
+            if(x>=0&&x<col&&y>=0&&y<row&&map[y][x]==1&&!visited[y][x]){
+                visited[y][x] = true;
+                dfs(y,x);
             }
         }
     }
