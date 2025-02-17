@@ -1,66 +1,95 @@
 import java.util.*;
 import java.io.*;
-
+/*
+    m 가로 col
+    n 세로 row
+    h 높이
+    1000000 => 탐색할 칸의 수 
+    1 익음 / 0 안익음 / -1 토마토 없음
+    
+    1. 입력받으면서 익은 토마토와 토마토가 없는 경우를 카운트 - 가장 밑부터 받음 !!! 
+    2. 토마토 퍼트리기 [ h,y,x,day ]
+        퍼트리면서 1에서 카운트한 수에 ++ 하기 => 만약 이 수가 col*row*h라면 day출력하고 끝내기
+    
+*/
 public class Main {
-	static int M,N,H;
-	static int[][][] list;
-	static int[] dm = {0,1,0,-1,0,0}; // 좌우
-	static int[] dn = {1,0,-1,0,0,0}; // 앞뒤
-	static int[] dh = {0,0,0,0,1,-1}; // 위아래
-	static Queue<int[]> que = new LinkedList<>(); //queue에는 m,n,h 며칠째에 익었는지 체크
-	static boolean visited[][][];
-	static int notTomato =0;
-	public static void main(String args[])throws IOException {
-		
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		M = Integer.parseInt(st.nextToken());	//가로
-		N = Integer.parseInt(st.nextToken());	//세로
-		H = Integer.parseInt(st.nextToken());	//높이
-		
-		
-		//입력받기
-		list = new int[H][M][N];
-		visited = new boolean[H][M][N];
-		for(int h=H-1;h>=0;h--) {
-			for(int n= 0;n<N;n++) {
-				st = new StringTokenizer(br.readLine());
-				for(int m=0;m<M;m++) {
-					list[h][m][n] = Integer.parseInt(st.nextToken());
-					if(list[h][m][n]==1) {
-						que.add(new int[] {h,m,n,0});
-						visited[h][m][n]  = true;
-					}
-					if(list[h][m][n]==0)notTomato++;
-				}
-			}
-		}
-		if(notTomato==0)System.out.println(0);
-		else BFS();
-		
-	}
-	public static void BFS() {
-		while(!que.isEmpty()) {
-			int cur[] = que.poll(); //h,m,n,day;
-			
-			for(int i=0;i<dm.length;i++) {
-				int h = cur[0]+dh[i];
-				int m = cur[1]+dm[i];
-				int n = cur[2]+dn[i];
-				//범위안에 있고 -1일때
-				if(h>=0&&h<H&&m>=0&&m<M&&n>=0&&n<N&&!visited[h][m][n]&&list[h][m][n]==0) {
-					visited[h][m][n]=true;
-					list[h][m][n]=1;
-					notTomato--;
-					que.add(new int[] {h,m,n,cur[3]+1});
-				}
-			}
-			
-			if(notTomato==0) {
-				System.out.println(cur[3]+1);
-				return ;
-			}
-		}
-		System.out.println("-1");
-	}
+  
+    private static int col;
+    private static int row;
+    private static int height;
+    private static int[][][] map;
+    private static boolean[][][] visited;
+    private static int cnt = 0;
+    private static int dx[] = {0,0,0,0,-1,1};
+    private static int dy[] = {0,0,1,-1,0,0};
+    private static int dh[] = {1,-1,0,0,0,0};
+    //[ h,y,x,day ]
+    private static Queue<int[]> que = new LinkedList<>();
+    
+    public static void main(String[] args) throws IOException {
+        
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        
+        col = Integer.parseInt(st.nextToken());
+        row = Integer.parseInt(st.nextToken());
+        height = Integer.parseInt(st.nextToken());
+        
+        map = new int [height][row][col];
+        visited = new boolean[height][row][col];
+        
+        for(int i=height-1;i>=0;i--){
+            for(int k = 0;k<row;k++){
+                st = new StringTokenizer(br.readLine());
+                for(int j=0;j<col;j++){
+                    map[i][k][j] = Integer.parseInt(st.nextToken());
+                    if(map[i][k][j]==1){
+                            cnt++;
+                            //[ h,y,x,day ]
+                            que.add(new int[]{i,k,j,0});
+                            visited[i][k][j] = true;
+                        }
+                    else if(map[i][k][j]==-1){
+                            cnt++;
+                            visited[i][k][j] = true;
+                        }
+                }
+            }
+        }
+        
+        if(cnt==height*row*col){
+            System.out.println("0");
+            System.exit(0);
+        }
+
+        int result = bfs();
+        System.out.println(result);
+        
+    }
+    
+    public static int bfs(){
+        
+        while(!que.isEmpty()){
+            int[] cur = que.poll();//[ h,y,x,day ]
+            for(int i=0;i<6;i++){
+                int h = dh[i]+cur[0];
+                int x = dx[i]+cur[2];
+                int y = dy[i]+cur[1];
+                if(x>=0&&x<col&&y>=0&&y<row&&h>=0&&h<height){
+                    if(!visited[h][y][x]&&map[h][y][x]==0){
+                        cnt++;
+                        if(cnt==height*row*col){
+                            return cur[3]+1;
+                        }
+                        else{
+                            visited[h][y][x]= true;
+                            que.add(new int[]{h,y,x,cur[3]+1});
+                        }                       
+                    }
+                }
+            }
+        }
+        
+        return -1;
+    }
 }
