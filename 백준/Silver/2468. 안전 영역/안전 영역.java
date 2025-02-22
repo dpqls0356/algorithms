@@ -1,69 +1,67 @@
 import java.util.*;
 import java.io.*;
 
+/*
+물에 잠기지않는 안전 영역 개수
+N*N 
+
+*/
 public class Main {
+    
+    private static int N;
+    private static int maxCnt = Integer.MIN_VALUE;
+    private static int[][] map;
+    private static boolean[][] visited;
+    private static int[] dx = {0,0,-1,1};
+    private static int[] dy = {1,-1,0,0};
+    
+    private static ArrayList<Integer> height = new ArrayList<>();
+    
+    public static void main(String[] args) throws IOException {
 
-	static int arr[][]; // 지도
-	static int N; // 지도크기
-	static int max = Integer.MIN_VALUE; // 가장 많은 안전영역 수
-	static int maxHeight = Integer.MIN_VALUE; // 물이 찰 수 있는 최대 높이
-	static int count; // 안전영역 수
-	static int water; // 물의 높이
-	static boolean visited[][]; // 방문배열
-	static int dx[] = { 1, 0, -1, 0 };
-	static int dy[] = { 0, 1, 0, -1 };
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        
+        N = Integer.parseInt(st.nextToken());
+        
+        map = new int[N][N];
+        
+        for(int i=0;i<N;i++){
+            st = new StringTokenizer(br.readLine());
+            for(int k=0;k<N;k++){
+                map[i][k] = Integer.parseInt(st.nextToken());
+                if(!height.contains(map[i][k]))height.add(map[i][k]);
+            }
+        }
+        
+        height.add(0);
+        for(int i=0;i<height.size();i++){
+            visited = new boolean[N][N];
+            int cnt = 0;
+             // System.out.println(height.get(i));
+            for(int k=0;k<N;k++){
+                for(int j=0;j<N;j++){
+                    if(map[k][j]>height.get(i)&&!visited[k][j]){
+                        dfs(k,j,height.get(i));
+                        cnt++;
+                    }
 
-	public static void main(String[] args) throws IOException {
-
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
-
-		N = Integer.parseInt(st.nextToken()); // 지도 크기 받기
-
-		arr = new int[N][N];
-
-		for (int i = 0; i < N; i++) { // 지도에 데이터 넣기
-			st = new StringTokenizer(br.readLine());
-			for (int k = 0; k < N; k++) {
-				arr[i][k] = Integer.parseInt(st.nextToken());
-				if (maxHeight < arr[i][k])
-					maxHeight = arr[i][k];
-			}
-		}
-
-		for (int i = 0; i < maxHeight; i++) {
-			water = i; // 믈높이
-			count = 0; // 안전영역 수
-			visited = new boolean[N][N]; // 방문배열
-			for (int n = 0; n < N; n++) {
-				for (int m = 0; m < N; m++) {
-					if (!visited[n][m] && arr[n][m] > water) {
-						BFS(n, m);
-						count++;
-					}
-				}
-			}
-			if (count > max)
-				max=count;
-		}
-		if(max==Integer.MIN_VALUE)System.out.println("0");
-		else	System.out.println(max);
-	}
-
-	public static void BFS(int n, int m) {
-		Queue<int[]> que = new LinkedList<>();
-		que.add(new int[] { n, m });
-		while (!que.isEmpty()) {
-			int cur[] = que.poll();
-			for (int i = 0; i < 4; i++) {
-				int x = cur[0] + dx[i];
-				int y = cur[1] + dy[i];
-				if(x<N&&x>=0&&y<N&&y>=0&&!visited[x][y]&&arr[x][y]>water) {
-					visited[x][y] = true;
-					que.add(new int[] {x,y});
-				}
-			}
-		}
-
-	}
+                }
+            }
+            if(cnt>maxCnt)maxCnt = cnt;
+        }
+        System.out.print(maxCnt);
+    }
+    
+    public static void dfs(int y,int x, int waterHeight){
+        visited[y][x] = true;
+        
+        for(int i=0;i<4;i++){
+            int newY = y +dy[i];
+            int newX = x +dx[i];
+            if(newX>=0&&newX<N&&newY>=0&&newY<N&&map[newY][newX]>waterHeight&&!visited[newY][newX]){
+                dfs(newY,newX,waterHeight);
+            }
+        }
+    }
 }
