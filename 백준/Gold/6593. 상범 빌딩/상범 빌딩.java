@@ -1,116 +1,105 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayDeque;
-import java.util.Queue;
-import java.util.StringTokenizer;
+import java.util.*;
+import java.io.*;
 
+/*
+상범이 이동 앞 뒤 양옆 위 아래
+빌딩 층수 L 
+한층의 R
+한층의 C
+막힌 칸 #
+비어있는칸 . 
+시작점 S
+도착점 E
+
+음 x,y,z로 쓰는게 맞지않나 .....
+
+*/
 public class Main {
-
-    /**
-     * 상범이의 이동 : 동서남북상하
-     * 출구로만 탈출이 가능하다
-     * L = 층수 R=row C=col
-     *
-     * # 막힌 길
-     * . 빈캄
-     * S 시작점
-     * E 출구
-     *
-     * 출력
-     * Escaped in x minute(s).         x가 결과
-     * Trapped!
-     * */
-
-    static char arr[][][];
-    static boolean visited[][][];
-    static int R, C, L;
-    static class Spot{
-        int x,y,z,time;
-        public Spot(){}
-        public Spot(int x,int y,int z,int time){
-            this.x=x;
-            this.y=y;
-            this.z=z;
-            this.time = time;
-        }
-
-
-    }
-    static Spot endSpot;
-    static Queue<Spot> que;
-
+    
+    private static int L;
+    private static int R;
+    private static int C;
+    private static char[][][] map;
+    private static boolean[][][] visited;
+    private static Queue<int[]> me;
+    private static int[] destination = new int[3];
+    private static int[] dh = new int[]{1,-1,0,0,0,0}; 
+    private static int[] dy = new int[]{0,0,1,-1,0,0}; 
+    // private static int[] dx = new int[]{1,-1,0,0,0,0};  아오 ... 왜 이동을 안하나 했다 ...... 
+    private static int[] dx = new int[]{0,0,0,0,1,-1};
+    private static StringBuilder sb = new StringBuilder();
+    
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st;
-
-
+        
         while(true){
+            
             st = new StringTokenizer(br.readLine());
+            
             L = Integer.parseInt(st.nextToken());
             R = Integer.parseInt(st.nextToken());
             C = Integer.parseInt(st.nextToken());
-
-            if(L<1||R<1||C<1){
-                break;
-            }
-            else{
-                visited = new boolean[R][C][L];
-                arr = new char[R][C][L];
-                que = new ArrayDeque<>();
-                for(int i=0;i<L;i++){
-                    for(int k=0;k<R;k++) {
-                        String str = br.readLine();
-                        for (int j = 0; j < C; j++) {
-                            arr[k][j][i] = str.charAt(j);
-                            if(arr[k][j][i]=='S'){
-                                que.add(new Spot(k,j,i,0));
-                                visited[k][j][i] = true;
-                            }
-                            if(arr[k][j][i]=='#'){
-                                visited[k][j][i] = true;
-                            }
-                            if(arr[k][j][i]=='E'){
-                                endSpot = new Spot(k,j,i,0);
-                            }
+            
+            if(L==0&&R==0&&C==0)break;
+            
+            map = new char[L][R][C];
+            visited = new boolean[L][R][C];
+            me = new LinkedList<>();
+                    
+            for(int i=0;i<L;i++){
+                for(int k=0;k<R;k++){
+                    String str = br.readLine();
+                    for(int j=0;j<C;j++){
+                        map[i][k][j] = str.charAt(j);
+                        if(map[i][k][j]=='S'){
+                            me.add(new int[]{i,k,j,0});
+                            visited[i][k][j] = true;
+                        }
+                        else if(map[i][k][j]=='E'){
+                            // visited[i][k][j] = true; 바봅 왜 방문처리를 해 !!!!!!! 
+                            destination = new int[]{i,k,j};
+                        }
+                        else if(map[i][k][j]=='#'){
+                            visited[i][k][j] = true;
                         }
                     }
-                   String str2= br.readLine();
                 }
-                BFS();
+                br.readLine();
             }
+            int result = bfs();
+            if(result == -1){
+                    sb.append("Trapped!\n");
+                }
+            else{
+                    sb.append("Escaped in "+result+" minute(s).\n");
+                }
         }
+        
+             System.out.print(sb.toString());
+        
     }
-
-    public static void BFS(){
-
-        while(!que.isEmpty()){
-
-            Spot cur = que.poll();
-
-            if(cur.x==endSpot.x&&cur.y== endSpot.y&&cur.z== endSpot.z){
-                System.out.println("Escaped in "+cur.time+" minute(s).");
-                return;
+    public static int bfs(){
+        
+        while(!me.isEmpty()){
+            int[] cur = me.poll(); //h , y , x , move
+            if(cur[0]==destination[0]&&cur[1]==destination[1]&&cur[2]==destination[2]){
+                return cur[3];
             }
-
-            //돌리기
-            int dx[] = {0,0,-1,1,0,0};
-            int dy[] = {-1,1,0,0,0,0};
-            int dz[] = {0,0,0,0,-1,1};
-
+            // System.out.println(cur[0]+" "+cur[1]+" "+cur[2]+" ");
             for(int i=0;i<6;i++){
-                int x = cur.x+dx[i];
-                int y = cur.y+dy[i];
-                int z = cur.z+dz[i];
-
-                if(x>=0&&y>=0&&z>=0&&x<R&&y<C&&z<L&&(arr[x][y][z]=='.'||arr[x][y][z]=='E')&&!visited[x][y][z]){
-                    visited[x][y][z] = true;
-                    que.add(new Spot(x,y,z,cur.time+1));
+                int h = cur[0]+dh[i];
+                int y = cur[1]+dy[i];
+                int x = cur[2]+dx[i];
+                
+                if(h>=0&&h<L&&y>=0&&y<R&&x>=0&&x<C&&!visited[h][y][x]){
+                    visited[h][y][x] = true;
+                    me.add(new int[]{h,y,x,cur[3]+1});
                 }
             }
-
         }
-        System.out.println("Trapped!");
+        
+        return -1;
     }
 }
