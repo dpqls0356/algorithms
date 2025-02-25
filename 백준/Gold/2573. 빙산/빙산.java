@@ -1,106 +1,142 @@
 import java.util.*;
 import java.io.*;
 
+/*
+0은 바다 나머지는 빙산
+일년마다 동서남북 방향으로 테두리만 사라짐
+
+두덩어리로 분리되는 최소 시간
+
+bfs 녹이고 -> dfs 덩어리 개수 카운트
+
+배열의 최대 크기 N M = 300*300 = 90000 9만 흠 1억번 
+*/
 public class Main {
-	
-	static int arr[][];	//지도
-	static int dx[] = {1,0,-1,0};	//네방향
-	static int dy[] = {0,1,0,-1};	
-	static int N,M;	//배열의 크기
-	static int time = 0;	//걸린시간
-	static int cnt = 0;		// 안녹은 빙하 수 
-	static boolean visited[][];
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		
-		N = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
-		
-		arr = new int[N][M];
-		
-		for(int i=0;i<N;i++) {
-			st = new StringTokenizer(br.readLine());
-			for(int k=0;k<M;k++) {
-				arr[i][k] = Integer.parseInt(st.nextToken());
-				cnt++;
-			}
-		}
+    
+    private static int map[][];
+    private static int memo[][];
+    private static int row,col;
+    private static Queue<int[]> que = new LinkedList<>(); // y,x,year
+    private static boolean[][] visited;
+    private static int ice = 0;
+    private static int year = 0;
+    private static int[] dx = {0,0,-1,1};
+    private static int[] dy = {1,-1,0,0};
+    
+    public static void main(String[] args) throws IOException {
 
-		while(cnt!=0) {
-			//현재 상태에서 얼만큼 녹일지 확인
-			int minus[][] = new int[N][M];
-			for(int i=0;i<N;i++) {
-				for(int k=0;k<M;k++) {
-					if(arr[i][k]!=0) {	// 빙하이면서
-						for(int a=0;a<4;a++) {
-							int x = i+dx[a];
-							int y = k+dy[a];
-							if(x>=0&&x<N&&y>=0&&y<M&&arr[x][y]==0) { //범위내의 장소이면서 바닷물일 경우
-								minus[i][k]++; //빙하의 감소값 증가시키기
-							}
-						}
-					}
-				}
-			}
-			//녹이기
-			for(int i=0;i<N;i++) {
-				for(int k=0;k<M;k++) {
-					if(minus[i][k]!=0) {	//빙하라면
-						arr[i][k]-=minus[i][k];	// 감소시킬 값만큼 빙하 줄이기
-						if(arr[i][k]<=0) {	//0보다 작아지면 0을 넣고 안녹은 빙하의 수 줄이기
-							arr[i][k]=0;
-							cnt--;
-						}
-					}
-				}
-			}
-			time++; //시간증가
-			//빙산이 분리되었는지 확인 -> 섬의 개수 ?
-			visited = new boolean[N][M];
-			int part = 0;
-			for(int i =0;i<N;i++) {
-				for(int k=0;k<M;k++) {
-					if(!visited[i][k]&&arr[i][k]!=0) {//방문안했고 빙하인 경우에만 BFS
-						BFS(i,k);
-						part++;	// 빙하 한 덩어리 탐색 했으니 덩어리 수 +1
-					}
-				}
-			}
-			// -----분리되었으면 = 덩어리가 한 개가 아니라면
-			if(part==0) {break;}
-			if(part!=1) { 
-				System.out.println(time);
-				return ;
-			}
-		}
-		System.out.println("0");
-	}
-	public static void BFS(int startX,int startY) {
-		Queue <int []> que = new ArrayDeque<>();
-		que.add(new int[] {startX,startY});
-		visited[startX][startY] = true;
-		
-		while(!que.isEmpty()) {
-			int cur[] = que.poll();
-			for(int i=0;i<4;i++) {
-				int x =cur[0]+dx[i];
-				int y = cur[1]+dy[i];
-				if(x>=0&&x<N&&y>=0&&y<M&&!visited[x][y]&&arr[x][y]!=0) {
-					visited[x][y] = true;
-					que.add(new int[] {x,y});
-				}
-			}
-		}
-	}
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());     
+        
+        row = Integer.parseInt(st.nextToken());
+        col = Integer.parseInt(st.nextToken());
+        
+        map = new int[row][col];
+        memo = new int[row][col];
+        for(int i=0;i<row;i++){
+            st = new StringTokenizer(br.readLine());
+            for(int k=0;k<col;k++){
+                map[i][k] = Integer.parseInt(st.nextToken());
+                memo[i][k] = map[i][k];
+                if(map[i][k]!=0){
+                    que.add(new int[]{i,k,0});
+                    ice ++;
+                }
+            }
+        }
+        //빙산이 없는 경우
+        if(ice==0){
+            System.out.print(0);
+            System.exit(0);
+        }
+        
+        int result = bfs();
+        
+        if(result == -1){
+            System.out.print(0);
+        }else System.out.print(result);
+    }
+    
+    public static int bfs(){
+        
+        while(!que.isEmpty()){
+                
+            int[] cur = que.poll();           
+            // 다음 년도로 넘어간 경우 dfs 돌려서 빙산 덩어리 개수 체킹
+            if(cur[2]!=year){
+                // System.out.println("year: "+ year);
+                //큐에 넣기 -> 다음에 돌려야함
+                que.add(cur);
+                
+                // 지도 복사하기
+                for(int i = 0;i<row;i++){
+                    System.arraycopy(memo[i],0, map[i], 0,col); 
+                }
+                
+                //dfs 돌려서 빙산 덩어리 개수 체킹
+                int cnt = 0;
+                visited = new boolean[row][col];
+                for(int i=0;i<row;i++){
+                    for(int k=0;k<col;k++){
+                        // System.out.print(map[i][k]+" ");
+                        if(!visited[i][k]&&map[i][k]>0){
+                            dfs(i,k);
+                            cnt++;
+                        }
+                    }
+                    // System.out.println();
+                }
+                // 두 덩어리 이상이면 리턴
+                if(cnt>=2){
+                    return cur[2];
+                }
+                // 아니면 년도 높여주기
+                else{
+                    year++;
+                }
+            }
+             // 현재 년도인 경우 빙산 녹이기
+            else{
+                //물이 있는 곳이 있는지 판단
+                int water = 0;
+                for(int i = 0 ; i<4;i++){
+                    int y = cur[0]+dy[i];
+                    int x = cur[1]+dx[i];
+                    if(map[y][x]<=0)water++;
+                }
+                if(cur[0]==2&&cur[1]==4){
+                    // System.out.println("water: "+water);
+                }
+                //물과 닿아있는 경우
+                if(water!=0){
+                    memo[cur[0]][cur[1]] -=water;
+                    if(memo[cur[0]][cur[1]]<0)memo[cur[0]][cur[1]]=0;
+                    //빙산이라면
+                    if( memo[cur[0]][cur[1]] != 0 ){
+                        que.add(new int[]{cur[0],cur[1],cur[2]+1});
+                    }
+                }
+                //물과 닿지않는 경우
+                else{
+                  que.add(new int[]{cur[0],cur[1],cur[2]+1});
+                }
+                
+            }
+           
+        }
+        return -1;
+    }
+    
+    public static void dfs(int y,int x){
+        
+        for(int i=0;i<4;i++){
+            int newY = y+dy[i];
+            int newX = x+dx[i];
+            if(newY>=0&&newX>=0&&newY<row&&newX<col&&!visited[newY][newX]&&map[newY][newX]>0)
+            {
+                visited[newY][newX] = true;
+                dfs(newY,newX);
+            }
+        }
+    }
 }
-
-
-//			System.out.println(part);
-//			for(int i=0;i<N;i++) {
-//				for(int k=0;k<M;k++) {
-//					System.out.print(arr[i][k]+" ");
-//				}
-//				System.out.println();
-//			}
-//			System.out.println("------------");
