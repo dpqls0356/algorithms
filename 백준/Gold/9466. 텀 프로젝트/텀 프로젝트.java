@@ -2,74 +2,60 @@ import java.util.*;
 import java.io.*;
 
 public class Main {
-    
+
     private static int[] arr;
-    private static int[] state; // 0: 미방문, 1: 현재 탐색 중, 2: 팀 구성됨, 3: 팀 구성 불가
-    private static int teamCount;
-    
+    private static boolean[] visited;
+    private static boolean[] isFinished; // 탐색 완료 여부
+    private static int teamCount; // 팀원 수를 정확히 카운트할 변수
+
     public static void main(String[] args) throws IOException {
         
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
         StringBuilder sb = new StringBuilder();
         
-        int T = Integer.parseInt(st.nextToken());
+        int T = Integer.parseInt(br.readLine());
         
-        while(T > 0) {
+        while(T-- > 0) {
             int person = Integer.parseInt(br.readLine());
             
-            arr = new int[person+1];
-            state = new int[person+1]; // 상태 배열 초기화
+            arr = new int[person + 1];
+            visited = new boolean[person + 1];
+            isFinished = new boolean[person + 1]; // 탐색이 끝났는지 체크
             
-            st = new StringTokenizer(br.readLine());
-            for(int i=1; i<person+1; i++) {
+            StringTokenizer st = new StringTokenizer(br.readLine());
+            for(int i = 1; i <= person; i++) {
                 arr[i] = Integer.parseInt(st.nextToken());
             }
             
-            teamCount = 0;
-            
-            // 모든 학생에 대해 탐색
-            for(int i=1; i<person+1; i++) {
-                if(state[i] == 0) { // 아직 방문하지 않은 경우
+            teamCount = 0; // 팀원 수 초기화
+            for(int i = 1; i <= person; i++) {
+                if(!visited[i]) {
                     dfs(i);
                 }
             }
             
-            sb.append(person - teamCount).append('\n');
-            T--;
+            sb.append(person - teamCount).append("\n"); // 팀원이 아닌 사람 수 출력
         }
         System.out.print(sb.toString());
     }
-    
-    public static void dfs(int node) {
-        state[node] = 1; // 현재 탐색 중
-        
-        int next = arr[node];
-        
-         // 다음 노드가 아직 방문하지 않은 경우
-        if(state[next] == 0) {
+
+    public static void dfs(int cur) {
+        visited[cur] = true;
+        int next = arr[cur];
+
+        if (!visited[next]) { // 아직 방문하지 않은 노드라면 DFS 탐색
             dfs(next);
-        }
-        
-        // 다음 노드가 현재 탐색 중인 경우 (사이클 발견)
-        else if(state[next] == 1) { 
-            // 사이클에 속한 노드 수 세기
-            int count = 1;
-            for(int i = next; i != node; i = arr[i]) {
-                count++;
+        } else if (!isFinished[next]) { // 이미 방문한 노드지만, 탐색이 끝나지 않았다면 사이클 발생
+            // 사이클 내 팀원 수 세기
+            int cycleCount = 1;
+            int temp = next;
+            while (temp != cur) { // 사이클을 도는 동안 카운트
+                cycleCount++;
+                temp = arr[temp];
             }
-            teamCount += count;
-            
-            // 사이클에 속한 노드들을 팀으로 표시
-            int current = next;
-            do {
-                state[current] = 2; // 팀 구성됨
-                current = arr[current];
-            } while(current != next);
+            teamCount += cycleCount;
         }
         
-        if(state[node] == 1) { // 아직 상태가 변경되지 않았다면
-            state[node] = 3; // 팀 구성 불가로 표시
-        }
+        isFinished[cur] = true; // 현재 노드의 DFS 탐색이 끝났음을 표시
     }
 }
