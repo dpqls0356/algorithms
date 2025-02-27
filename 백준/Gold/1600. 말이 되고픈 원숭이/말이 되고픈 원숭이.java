@@ -1,150 +1,96 @@
 import java.util.*;
 import java.io.*;
 
+/*
+체스 나이트와 같은 방식으로 이동 
+단 이것은 k번만 가능하고
+원래는 상하좌우만 가능
+맨왼쪽위에서 맨왼쪽 아래쪽까지 이동 -> 0,0, -> row-1,col-1
+
+궁금한점 말은 장애물을 뛰어넘을 수 있다는 건 막힌 공간도 뛰어넘어서 목표지까지 갈 수 있다는거겠죠 ??
+그럼 말의 움직임으로 움직이는 원숭이도 장애물을 뛰어넘을 수  있다는 건강
+
+k 
+col , row
+0 = 평지 1 = 장애물        
+
+일단 방문배열이 k만큼 필요할듯
+이것도 벽 부수고 이동하기랑 같은 느낌의 문제로 인 것 같다
+
+
+
+*/
 public class Main {
-	
-	static class Spot{//원숭이 위치
-		int x,y,cnt;
-		int horse;//말처럼 갈 수 있는 횟수
-		public Spot() {}
-		public Spot(int x,int y,int cnt,int horse) {
-			this.x=x;
-			this.y=y;
-			this.cnt=cnt;
-			this.horse = horse;
-		}
-	}
-	static int arr[][];
-	static boolean visited[][][];
-	static int N,M;
-	static int horseCnt;
-	static int min = Integer.MAX_VALUE;
-	public static void main(String[] args)throws IOException {
-	
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		horseCnt = Integer.parseInt(st.nextToken());
-		
-		st = new StringTokenizer(br.readLine());
-		M = Integer.parseInt(st.nextToken());
-		N = Integer.parseInt(st.nextToken());
-		
-		arr = new int[N+1][M+1];
-		visited  = new boolean[horseCnt+1][N+1][M+1];
-		
-		for(int i=1;i<=N;i++) {
-			st = new StringTokenizer(br.readLine());
-			for(int k=1;k<=M;k++) {
-				arr[i][k] = Integer.parseInt(st.nextToken());
-			}
-		}
-		
-		BFS();
-		if(min==Integer.MAX_VALUE)System.out.println("-1");
-		else System.out.println(min);
-	}
-	
-	public static void BFS() {
-		Queue<Spot> que = new ArrayDeque<>();
-		que.add(new Spot(1,1,0,horseCnt));
-		visited[horseCnt][1][1] = true;
-		while(!que.isEmpty()) {
-			Spot cur = que.poll();
-//			System.out.println("cur x,y: "+cur.x+" "+cur.y+" horse"+cur.horse);
-			if(cur.x==N&&cur.y==M) {
-				if(min>cur.cnt)min = cur.cnt;
-				continue;
-			}
-			if(cur.cnt>min)continue;
-			//말의 이동
-			if(cur.horse>0) {
-				//row-1 col-2
-				int x = cur.x-1;
-				int y = cur.y-2;
-				if(x>0&&y>0&&!visited[cur.horse-1][x][y]&&arr[x][y]==0) {
-					visited[cur.horse-1][x][y]=true;
-					que.add(new Spot(x,y,cur.cnt+1,cur.horse-1));
-					if(x==cur.x&&cur.y==y)visited[cur.horse-1][x][y]=false;
-					//System.out.println("x,y: "+x+" "+y+" horse:"+(cur.horse-1));
-				}
-				//row-1 col+2
-				x = cur.x-1;
-				y = cur.y+2;
-				if(x>0&&y<=M&&!visited[cur.horse-1][x][y]&&arr[x][y]==0) {
-					visited[cur.horse-1][x][y]=true;
-					que.add(new Spot(x,y,cur.cnt+1,cur.horse-1));
-					if(x==cur.x&&cur.y==y)visited[cur.horse-1][x][y]=false;
-					//System.out.println("x,y: "+x+" "+y+" horse:"+(cur.horse-1));
-				}
-				//row-2 col-1
-				x = cur.x-2;
-				y = cur.y-1;
-				if(x>0&&y>0&&!visited[cur.horse-1][x][y]&&arr[x][y]==0) {
-					visited[cur.horse-1][x][y]=true;
-					que.add(new Spot(x,y,cur.cnt+1,cur.horse-1));
-					if(x==cur.x&&cur.y==y)visited[cur.horse-1][x][y]=false;
-					//System.out.println("x,y: "+x+" "+y+" horse:"+(cur.horse-1));
-				}
-				//row-2 col+1
-				x = cur.x-2;
-				y = cur.y+1;
-				if(x>0&&y<=M&&!visited[cur.horse-1][x][y]&&arr[x][y]==0) {
-					visited[cur.horse-1][x][y]=true;
-					que.add(new Spot(x,y,cur.cnt+1,cur.horse-1));
-					if(x==cur.x&&cur.y==y)visited[cur.horse-1][x][y]=false;
-					//System.out.println("x,y: "+x+" "+y+" horse:"+(cur.horse-1));
-				}
-				//row+1 col-2
-				x = cur.x+1;
-				y = cur.y-2;
-				if(x<=N&&y>0&&!visited[cur.horse-1][x][y]&&arr[x][y]==0) {
-					visited[cur.horse-1][x][y]=true;
-					que.add(new Spot(x,y,cur.cnt+1,cur.horse-1));
-					if(x==cur.x&&cur.y==y)visited[cur.horse-1][x][y]=false;
-					//System.out.println("x,y: "+x+" "+y+" horse:"+(cur.horse-1));
-				}
-				//row+1 col+2
-				x = cur.x+1;
-				y = cur.y+2;
-				if(x<=N&&y<=M&&!visited[cur.horse-1][x][y]&&arr[x][y]==0) {
-					visited[cur.horse-1][x][y]=true;
-					que.add(new Spot(x,y,cur.cnt+1,cur.horse-1));
-					if(x==cur.x&&cur.y==y)visited[cur.horse-1][x][y]=false;
-					//System.out.println("x,y: "+x+" "+y+" horse:"+(cur.horse-1));
-				}
-				//row+2 col-1
-				x = cur.x+2;
-				y = cur.y-1;
-				if(x<=N&&y>0&&!visited[cur.horse-1][x][y]&&arr[x][y]==0) {
-					visited[cur.horse-1][x][y]=true;
-					que.add(new Spot(x,y,cur.cnt+1,cur.horse-1));
-					if(x==cur.x&&cur.y==y)visited[cur.horse-1][x][y]=false;
-					//System.out.println("x,y: "+x+" "+y+" horse:"+(cur.horse-1));
-				}
-				//row+2 col+1
-				x = cur.x+2;
-				y = cur.y+1;
-				if(x<=N&&y<=M&&!visited[cur.horse-1][x][y]&&arr[x][y]==0) {
-					visited[cur.horse-1][x][y]=true;
-					que.add(new Spot(x,y,cur.cnt+1,cur.horse-1));
-					if(x==cur.x&&cur.y==y)visited[cur.horse-1][x][y]=false;
-					//System.out.println("x,y: "+x+" "+y+" horse:"+(cur.horse-1));
-				}
-			}
-			//4방향 이동
-			int dx[] = {1,0,-1,0};
-			int dy[] = {0,1,0,-1};
-			for(int i=0;i<4;i++) {
-				int x = cur.x+dx[i];
-				int y = cur.y+dy[i];
-				if(x>0&&x<=N&&y>0&&y<=M&&!visited[cur.horse][x][y]&&arr[x][y]==0) {
-					visited[cur.horse][x][y]=true;
-					que.add(new Spot(x,y,cur.cnt+1,cur.horse));
-					if(x==cur.x&&cur.y==y)visited[cur.horse][x][y]=false;
-//					System.out.println("x,y: "+x+" "+y+" horse:"+(cur.horse));
-				}
-			}
-//			System.out.println("====================");
-		}
-	}
+    
+    private static int K;
+    private static int[][] map;
+    private static boolean[][][] visited;
+    private static int row,col;
+    private static int[] dx = {0,0,-1,1};
+    private static int[] dy = {1,-1,0,0};
+    private static int[] horseY = {1,2,2,1,-1,-2,-2,-1};
+    private static int[] horseX = {-2,-1,1,2,-2,-1,1,2};
+    
+    public static void main(String[] args) throws IOException  {
+    
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st;
+        
+        K = Integer.parseInt(br.readLine());
+        
+        st = new StringTokenizer(br.readLine());
+        col = Integer.parseInt(st.nextToken());
+        row = Integer.parseInt(st.nextToken());
+        
+        visited  = new boolean [row][col][K+1]; // 앟 K+1인데 K로 함 ㅜㅜ
+        map = new int[row][col];
+        
+        for(int i=0;i<row;i++){
+            st = new StringTokenizer(br.readLine());
+            for(int k=0;k<col;k++){
+                map[i][k] = Integer.parseInt(st.nextToken());
+                // if(map[i][k]==1)visited[i][k][] = false; // 이거 불가능한게 모든 visited[i][k][0 ~ K-1]까지 true해줘야함 ;;; ㅋㅋㅠㅠ 
+            }
+        }
+        
+        int result = bfs();
+        
+        System.out.print(result);
+    
+    }
+    
+    public static int bfs(){
+        
+        Queue<int[]> que = new LinkedList<>();
+        que.add(new int[]{0,0,0,0}); // 현재 y,x,move,말처럼 움직인 횟수
+        
+        while(!que.isEmpty()){
+            int[] cur = que.poll();
+            if(cur[0]==row-1&&cur[1]==col-1){
+                return cur[2];
+            }
+            //말로 움직일 수 있을 때
+            if(cur[3]<K){
+                for(int i=0;i<horseX.length;i++){
+                    int y= cur[0]+horseY[i];
+                    int x= cur[1]+horseX[i];
+                    if(y>=0&&y<row&&x>=0&&x<col&&!visited[y][x][cur[3]+1]&&map[y][x]==0){
+                        visited[y][x][cur[3]+1] = true;
+                        que.add(new int[]{y,x,cur[2]+1,cur[3]+1});
+                    }
+                }
+            }
+            for(int i=0;i<dx.length;i++){
+                int y= cur[0]+dy[i];
+                int x= cur[1]+dx[i];
+                if(y>=0&&y<row&&x>=0&&x<col&&!visited[y][x][cur[3]]&&map[y][x]==0){
+                    visited[y][x][cur[3]] = true;
+                    que.add(new int[]{y,x,cur[2]+1,cur[3]});
+                }
+            }
+            
+        }
+              
+        return -1;
+    }
 }
