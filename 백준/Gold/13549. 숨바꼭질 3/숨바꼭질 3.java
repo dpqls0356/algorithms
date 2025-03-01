@@ -1,76 +1,75 @@
 import java.util.*;
-import java.io.*;
-/*
-첫번째 풀었을때 틀림
- -> 1. 음 생각해보니 만약 0초에 도착할 수 있는데 
-    큐 순서상 n초 후에 먼저 도착하고 그게 먼저 발견되어 결과로 출력될 수도 있겠다는 생각을 함
- -> 최솟값을 구하도록 바꿈
-그래도 틀림 ㅋㅋ ㅜㅜ
- -> 아 도착지는 방문처리 하면 안되겠다 ! 
-그래도 틀림 ㅋㅋ ㅜㅜ
- -> 아 복붙해서 조건을 잘못 줌 ㅜㅜ
-
- => 생각해보니 이렇게하면 방문배열에도 문제가 생길 것 같음
-
-문제점은 잘 파악했으나 해결방법이 잘못 되었음 ...
-1번 문제는 우선순위 큐를 사용해야함.. 그러면 항상 최단 시간이 앞에 배치되기때문에 방문배열처리도 고민하지않아도 된다.
-
-인 줄 알았느나 이렇게 하면 안됨 ㅜ.ㅜ
-
-방문배열 안쓰고 시간 기록 용 배열을 써야할 듯
-
-*/
 
 public class Main {
-    
-    private static int maxSize = 100_000;
-    
     public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int N = scanner.nextInt();  // 수빈이의 위치
+        int K = scanner.nextInt();  // 동생의 위치
+        scanner.close();
         
-        Scanner sc = new Scanner(System.in);
+        System.out.println(findShortestTime(N, K));
+    }
+    
+    static class Position implements Comparable<Position> {
+        int pos;    // 위치
+        int time;   // 소요 시간
         
-        int subeen = sc.nextInt();
-        int sister = sc.nextInt();
-        
-        if(subeen == sister) {
-            System.out.println(0);
-            return;
+        public Position(int pos, int time) {
+            this.pos = pos;
+            this.time = time;
         }
         
-        int[] dist = new int[maxSize + 1];
-        Arrays.fill(dist, Integer.MAX_VALUE);
-        dist[subeen] = 0;
+        @Override
+        public int compareTo(Position other) {
+            return this.time - other.time;  // 시간 기준 오름차순 정렬
+        }
+    }
+    
+    public static int findShortestTime(int N, int K) {
+        // 최대 위치 범위 설정
+        int maxPos = 100000;
         
-        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> a[1] - b[1]);
-        pq.add(new int[]{subeen, 0});
+        // 방문 여부 체크 배열
+        boolean[] visited = new boolean[maxPos + 1];
         
-        while(!pq.isEmpty()) {
-            int[] cur = pq.poll();
-            int pos = cur[0];
-            int time = cur[1];
+        // 우선순위 큐 생성 (시간이 적은 것이 우선)
+        PriorityQueue<Position> pq = new PriorityQueue<>();
+        pq.offer(new Position(N, 0));
+        
+        while (!pq.isEmpty()) {
+            Position current = pq.poll();
+            int pos = current.pos;
+            int time = current.time;
             
-            if(time > dist[pos]) continue;
-            
-            if(pos == sister) {
-                System.out.println(time);
-                return;
+            // 이미 방문한 위치면 스킵
+            if (visited[pos]) {
+                continue;
             }
             
-            if(pos * 2 <= maxSize && time < dist[pos * 2]) {
-                dist[pos * 2] = time;
-                pq.add(new int[]{pos * 2, time});
+            // 방문 표시
+            visited[pos] = true;
+            
+            // 목표 위치에 도달한 경우
+            if (pos == K) {
+                return time;
             }
             
-            if(pos - 1 >= 0 && time + 1 < dist[pos - 1]) {
-                dist[pos - 1] = time + 1;
-                pq.add(new int[]{pos - 1, time + 1});
+            // 순간이동 (0초 소요)
+            if (pos * 2 <= maxPos && !visited[pos * 2]) {
+                pq.offer(new Position(pos * 2, time));
             }
             
-            if(pos + 1 <= maxSize && time + 1 < dist[pos + 1]) {
-                dist[pos + 1] = time + 1;
-                pq.add(new int[]{pos + 1, time + 1});
+            // 왼쪽으로 이동 (1초 소요)
+            if (pos - 1 >= 0 && !visited[pos - 1]) {
+                pq.offer(new Position(pos - 1, time + 1));
+            }
+            
+            // 오른쪽으로 이동 (1초 소요)
+            if (pos + 1 <= maxPos && !visited[pos + 1]) {
+                pq.offer(new Position(pos + 1, time + 1));
             }
         }
         
+        return -1;  // 도달할 수 없는 경우 (실제로는 발생하지 않음)
     }
 }
