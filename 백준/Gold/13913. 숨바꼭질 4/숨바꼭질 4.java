@@ -1,80 +1,70 @@
+import java.util.*;
+import java.io.*;
+/*
+가중치가 다르지않음
+단 길을 기록해야함...
 
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Scanner;
-
+*/
 public class Main {
-	
-	public static void main(String[] args) {
-		StringBuilder sb = new StringBuilder();
-		Scanner sc = new Scanner(System.in);
-		int N = sc.nextInt();
-		int K = sc.nextInt();
-		Node selectedNode = null;
-		Queue<Node> que = new ArrayDeque<>();
-		Map<Integer, Integer> map =new HashMap<>();
-		
-		//동생이 더 낮은 위치에 있는 경우
-		if(K<N) {
-			sb.append(N-K+"\n");
-			for(int i=N;i>=K;i--) {
-				sb.append(i+" ");
-			}
-			System.out.print(sb);
-			return;
-		}
-		
-		
-		que.add(new Node(N,N+""));
-		map.put(N, 0); // 수빈의 위치 방문처리
-		
-		while(!que.isEmpty()) {
-			Node node = que.poll();
-			// 동생을 찾은 경우
-			if(node.pos==K) {
-				selectedNode = node;
-				break;
-			}
+    public static void main(String[] args) throws IOException {
 
-            if (!map.containsKey(node.pos + 1) && node.pos < K) { // 이전에 방문했으면 안가기
-                que.offer(new Node(node.pos + 1, node.pre + " " + (node.pos + 1))); // 기존 위치에 +1
-                map.put(node.pos + 1, 0); // 방문처리
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        
+        int subeen = Integer.parseInt(st.nextToken());
+        int sister = Integer.parseInt(st.nextToken());
+        
+        if(subeen == sister){
+            System.out.print(0+"\n"+sister);
+            return ;
+        }
+        PriorityQueue<int[]> que = new PriorityQueue<>((a,b)->a[1]-b[1]);
+        que.add(new int[]{subeen,0,});
+        
+        int timeList[] = new int[100_001];
+        int routes[] = new int[100_001];
+        for(int i=0;i<100_001;i++){
+            timeList[i] = Integer.MAX_VALUE;
+        }
+        timeList[subeen] = 0;
+        
+        while(!que.isEmpty()){
+            int[] cur = que.poll();
+            
+            int pos = cur[0]; // 현재 위치 
+            int time = cur[1]; // 시간
+
+            if(pos == sister){
+                System.out.println(timeList[pos]);
+                
+                ArrayList<Integer> resultRoute = new ArrayList<>();
+                int current = pos;
+                while(current!=subeen){
+                    resultRoute.add(current);
+                    current = routes[current];
+                }
+                resultRoute.add(subeen);
+                for(int i=resultRoute.size()-1;i>=0;i--){
+                    System.out.print(resultRoute.get(i)+" ");
+                }
+                return;
             }
-            if (!map.containsKey(node.pos - 1)) { // 이전에 방문했으면 안가기
-                que.offer(new Node(node.pos - 1, node.pre + " " + (node.pos - 1))); // 기존 위치에 -1
-                map.put(node.pos - 1, 0); // 방문처리
+            if(pos*2<=100_000&&timeList[pos*2]>time+1){
+                que.add(new int[]{pos*2,time+1});
+                 timeList[pos*2] = time+1;
+                 routes[pos*2] = pos;
             }
-            if (!map.containsKey(node.pos * 2) && node.pos < K && node.pos <= 50000) { // 이전에 방문했으면 안가기
-                que.offer(new Node(node.pos * 2, node.pre + " " + (node.pos * 2))); // 기존 위치  X 2
-                map.put(node.pos * 2, 0);// 방문처리
+            if(pos+1<=100_000&&timeList[pos+1]>time+1){
+                que.add(new int[]{pos+1,time+1});
+                timeList[pos+1] = time+1;
+                routes[pos+1] = pos;
             }
-			
-		}
-		
-		String res[] = selectedNode.pre.split(" ");
-		sb.append(res.length-1+"\n");
-		for(int i=0;i<res.length;i++) {
-			sb.append(res[i]+" ");
-		}
-		System.out.print(sb);
-	}
-	 public static class Node{
-		 // 경로 저장
-		 String pre;
-		 // 위치 저장
-		 int pos;
-		/**
-		 * @param pre
-		 * @param pos
-		 */
-		public Node(int pos,String pre) {
-			super();
-			this.pre = pre;
-			this.pos = pos;
-		}
-		 
-	 }
-	 
+            if(pos-1>=0&&timeList[pos-1]>time+1){
+                que.add(new int[]{pos-1,time+1});
+                timeList[pos-1] = time+1;
+                routes[pos-1] = pos;
+            }
+
+        }
+    }
 }
