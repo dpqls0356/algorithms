@@ -95,7 +95,7 @@ public class Main {
                             que.add(new int[]{y,x,move+1});                        
                         }
                         //다리 짓기 완료
-                        else if(map[y][x]!=startIsland&&map[y][x]!=0){
+                        else if(map[y][x]>startIsland&&map[y][x]!=0){
                             minDis = move;
                             return;
                         }
