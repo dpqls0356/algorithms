@@ -1,94 +1,77 @@
 import java.io.*;
 import java.util.*;
 
-class Move{
-    int x;
-    int y;
-    int cnt;
-    int useChance;
-    int isAfternoon; //1 = 낮 , 0 = 밤
-    
-    //하 .. 생성자 x,y받는 순서 틀림
-    public Move(int y,int x,int cnt,int useChance,int isAfternoon){
-        this.x = x ;
-        this.y = y ;
-        this.cnt = cnt;
-        this.useChance = useChance;
-        this.isAfternoon = isAfternoon;
-    }
-}
+/*
+원래 벽부이2 코드에
+시간이라는 개념을 추가
+시간이 홀수면 낮
+시간이 짝수면 밤
+
+단 주의할점이
+밤일 때도 벽이 아니면 움직일수있어야함
+
+
+*/
 public class Main {
-    public static int[][] map;
-    public static int N,M,K;
-    public static boolean[][][][] visited;
-    public static int[] dy = {1,-1,0,0};
-    public static int[] dx = {0,0,1,-1};
-    public static void main(String[] args)throws IOException {
-        
+    
+    private static int N, M, K;
+    private static int[][] arr;
+    private static boolean[][][] visited;
+    private static int[] dy = {-1,1,0,0};
+    private static int[] dx = {0,0,-1,1};
+
+    public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
         K = Integer.parseInt(st.nextToken());
-        
-        map = new int[N+1][M+1];
-        visited = new boolean[N+1][M+1][K+1][2];
-        
-        for(int i=1;i<=N;i++){
-            String str = br.readLine();
-            for(int k=1;k<=M;k++){
-                map[i][k] = Integer.parseInt(str.charAt(k-1)+"");
+        arr = new int[N][M];
+        visited = new boolean[N][M][K + 1];
+
+        for (int i = 0; i < N; i++) {
+            String s = br.readLine();
+            for (int j = 0; j < M; j++) {
+                arr[i][j] = s.charAt(j) - '0';
             }
         }
-        
-        int result = bfs();
-        
-        System.out.print(result);
-        
+
+        int count = method(0, 0, K);
+        System.out.println(count);
     }
-    
-    public static int bfs() {
-        Deque<Move> que = new ArrayDeque<>();
-        que.add(new Move(1, 1, 1, 0, 1)); // (y, x, cnt, 부순횟수, 낮=1)
-        visited[1][1][0][1] = true;
 
-        while (!que.isEmpty()) {
-            Move cur = que.poll();
-            if (cur.x == M && cur.y == N) return cur.cnt;
+    private static int method(int y, int x, int k) {
+        Queue<int[]> q = new LinkedList<>();
+        q.add(new int[]{y, x, 1, k, 1});
+        visited[y][x][k] = true;
 
-            int nextDay = cur.isAfternoon == 1 ? 0 : 1;
+        while (!q.isEmpty()) {
+            int[] temp = q.poll();
+            int curY = temp[0], curX = temp[1], dist = temp[2], curK = temp[3], time = temp[4];
 
-            // 상하좌우 탐색
-            for (int i = 0; i < 4; i++) {
-                int y = cur.y + dy[i];
-                int x = cur.x + dx[i];
-
-                if (x <= 0 || x > M || y <= 0 || y > N) continue;
-
-                //벽일 경우
-                if(map[y][x] == 1){
-                    if(cur.isAfternoon == 1 && cur.useChance < K && !visited[y][x][cur.useChance + 1][nextDay]){
-                        visited[y][x][cur.useChance + 1][nextDay] = true;
-                        que.add(new Move(y, x, cur.cnt + 1, cur.useChance + 1, nextDay));
-                    }
-                    else if(cur.isAfternoon == 0 && !visited[cur.y][cur.x][cur.useChance][1]){
-                        visited[cur.y][cur.x][cur.useChance][1] = true;
-                        que.add(new Move(cur.y, cur.x, cur.cnt + 1, cur.useChance, 1));
-                    }
-                }
-                // 길일 경우
-                else if (map[y][x] == 0 && !visited[y][x][cur.useChance][nextDay]) {
-                    visited[y][x][cur.useChance][nextDay] = true;
-                    que.add(new Move(y, x, cur.cnt + 1, cur.useChance, nextDay));
-                }
-                
-
+            if (curY == N - 1 && curX == M - 1) {
+                return dist;
             }
 
+            for (int i = 0; i < 4; i++) {
+                int goY = curY + dy[i];
+                int goX = curX + dx[i];
 
-        }
+                if (goY >= 0 && goX >= 0 && goY < N && goX < M) {
+                    if (arr[goY][goX] == 0 && !visited[goY][goX][curK]) {
+                        visited[goY][goX][curK] = true;
+                        q.add(new int[]{goY, goX, dist + 1, curK, time + 1});
+                    }
+                    else if (arr[goY][goX] == 1 && curK > 0 && !visited[goY][goX][curK - 1]&&time % 2 == 1) {
+                        visited[goY][goX][curK - 1] = true;
+                        q.add(new int[]{goY, goX, dist + 1, curK - 1, time + 1});
+                    }
+                    else if(arr[goY][goX] == 1 && curK > 0 && !visited[goY][goX][curK - 1]&&time % 2 == 0) { // 밤이면 제자리에서 대기
+                            q.add(new int[]{curY, curX, dist + 1, curK, time + 1});
+                        }
+                    }
+                }
+            }
         return -1;
     }
-
 }
