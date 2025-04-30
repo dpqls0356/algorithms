@@ -16,13 +16,12 @@ public class Main {
         
         int memo = 0;
         
-        for(int i=1;i<=n;i++){
-            dp[i] = Math.max(dp[i], memo);
-            int dest = i+time[i]-1;
-            if(dest<=n){
-                dp[dest] = Math.max(cost[i]+dp[i-1],dp[dest]);
+	     for (int i = 1; i <= n; i++) {
+            dp[i] = Math.max(dp[i], dp[i - 1]);
+            int dest = i + time[i] - 1;
+            if (dest <= n) {
+                dp[dest] = Math.max(dp[dest], dp[i - 1] + cost[i]);
             }
-            memo = Math.max(memo, dp[i]);
         }
         
         int max = dp[0];
