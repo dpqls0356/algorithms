@@ -19,8 +19,8 @@ public class Main {
             sum += scores[i];
         }
         
-        double newAverage = sum / n;
-        System.out.println(newAverage);
+        double average = sum / n;
+        System.out.println(average);
         
         scanner.close();
     }
