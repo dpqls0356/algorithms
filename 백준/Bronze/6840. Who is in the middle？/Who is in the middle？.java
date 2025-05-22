@@ -5,7 +5,9 @@ public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         int[] weights = new int[3];
-        for (int i = 0; i < 3; i++) weights[i] = sc.nextInt();
+        weights[0] = sc.nextInt();
+        weights[1] = sc.nextInt();
+        weights[2] = sc.nextInt();
         Arrays.sort(weights);
         System.out.println(weights[1]);
     }
